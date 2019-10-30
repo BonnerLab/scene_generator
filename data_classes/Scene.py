@@ -1,5 +1,7 @@
 import random
+from copy import deepcopy
 import numpy as np
+from PIL import Image
 from data_classes.Point import Point
 from data_classes.Object import Object
 from data_classes.Surface import Surface
@@ -9,6 +11,7 @@ from data_classes.Orientation import Orientation
 class Scene:
 
     def __init__(self, floor_plan: np.ndarray):
+        floor_plan = deepcopy(floor_plan)
         floor_plan = Scene.squeeze_floor_plan(floor_plan)
         self.floor_plan = floor_plan
         self.floor, self.ceiling, self.walls = Scene.make_surfaces(floor_plan)
@@ -55,6 +58,18 @@ class Scene:
                     return False
         return True
 
+    def visualize_floor_plan(self):
+        image = self.floor_plan.astype(np.uint8)
+        image = image * 255
+        image = Image.fromarray(image)
+        width, height = image.width, image.height
+        if width > height:
+            new_width, new_height = 500, int(500 * height/width)
+        else:
+            new_width, new_height = int(500 * width/height), 500
+        image = image.resize((new_width, new_height))
+        image.show()
+
     @classmethod
     def squeeze_floor_plan(cls, floor_plan):
         x_min = 0
@@ -94,7 +109,7 @@ class Scene:
                 while not floor_plan[x - 1, y] and floor_plan[x, y]:
                     y += 1
                 x_end, y_end = x, y
-                walls.append(Surface(0, centre=Point(x, (y_end - y_start) // 2, 1),
+                walls.append(Surface(0, centre=Point(x, y_start + (y_end - y_start) // 2, 1),
                                      normal=Orientation.RIGHT, size=(y_end - y_start, 2)))
                 x_start, y_start = x, y
                 if floor_plan[x - 1, y]:
@@ -103,7 +118,40 @@ class Scene:
                     direction = Orientation.RIGHT
 
             elif direction == Orientation.LEFT:
-                pass
+                while not floor_plan[x - 1, y - 1] and floor_plan[x - 1, y]:
+                    x -= 1
+                x_end, y_end = x, y
+                walls.append(Surface(0, centre=Point(x_start - (x_start - x_end) // 2, y, 1),
+                                     normal=Orientation.FRONT, size=(x_start - x_end, 2)))
+                x_start, y_start = x, y
+                if floor_plan[x - 1, y - 1]:
+                    direction = Orientation.BACK
+                else:
+                    direction = Orientation.FRONT
+
+            elif direction == Orientation.BACK:
+                while not floor_plan[x, y - 1] and floor_plan[x - 1, y - 1]:
+                    y -= 1
+                x_end, y_end = x, y
+                walls.append(Surface(0, centre=Point(x, y_start - (y_start - y_end) // 2, 1),
+                                     normal=Orientation.LEFT, size=(y_start - y_end, 2)))
+                x_start, y_start = x, y
+                if floor_plan[x, y - 1]:
+                    direction = Orientation.RIGHT
+                else:
+                    direction = Orientation.LEFT
+
+            else:
+                while not floor_plan[x, y] and floor_plan[x, y - 1]:
+                    x += 1
+                x_end, y_end = x, y
+                walls.append(Surface(0, centre=Point(x_start + (x_end - x_start) // 2, y, 1),
+                                     normal=Orientation.BACK, size=(x_end - x_start, 2)))
+                x_start, y_start = x, y
+                if floor_plan[x, y]:
+                    direction = Orientation.FRONT
+                else:
+                    direction = Orientation.BACK
 
             if (x_start, y_start) == (x_global_start, y_global_start) and direction == Orientation.FRONT:
                 break
