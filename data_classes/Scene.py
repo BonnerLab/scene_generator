@@ -14,12 +14,13 @@ class Scene:
         floor_plan = deepcopy(floor_plan)
         floor_plan = Scene.squeeze_floor_plan(floor_plan)
         self.floor_plan = floor_plan
+        self.object_floor_plan = floor_plan.copy()
         self.floor, self.ceiling, self.walls = Scene.make_surfaces(floor_plan)
         self.objects = []
         self.lights = []
 
     def navigable_points(self):
-        return np.argwhere(self.floor_plan).tolist()
+        return np.argwhere(self.object_floor_plan).tolist()
 
     def add_random_object(self, type, size):
         rotation = random.choice([Orientation.LEFT, Orientation.FRONT, Orientation.RIGHT, Orientation.BACK])
@@ -41,7 +42,7 @@ class Scene:
             sx, sy = sy, sx
         for x in range(object.position.x - sx // 2, object.position.x + sx // 2):
             for y in range(object.position.y - sy // 2, object.position.y + sy // 2):
-                self.floor_plan[x, y] = False
+                self.object_floor_plan[x, y] = False
 
         return True
 
@@ -54,12 +55,13 @@ class Scene:
             sx, sy = sy, sx
         for x in range(object.position.x - sx // 2, object.position.x + sx // 2):
             for y in range(object.position.y - sy // 2, object.position.y + sy // 2):
-                if not self.floor_plan[x, y]:
+                if not self.object_floor_plan[x, y]:
                     return False
         return True
 
-    def visualize_floor_plan(self):
-        image = self.floor_plan.astype(np.uint8)
+    def visualize_floor_plan(self, with_objects=False):
+        floor_plan = self.object_floor_plan if with_objects else self.floor_plan
+        image = floor_plan.astype(np.uint8)
         image = image * 255
         image = Image.fromarray(image)
         width, height = image.width, image.height
