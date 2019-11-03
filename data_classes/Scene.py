@@ -25,10 +25,10 @@ class Scene:
     def add_random_object(self, type, size):
         rotation = random.choice([Orientation.LEFT, Orientation.FRONT, Orientation.RIGHT, Orientation.BACK])
         object = Object(type, Point(0, 0, 0), rotation, size)
-        candidate_positions = self.navigable_points()
-        random.shuffle(candidate_positions)
-        for x, y in candidate_positions:
-            object.position = Point(x, y, 0)
+        candidate_locations = self.navigable_points()
+        random.shuffle(candidate_locations)
+        for x, y in candidate_locations:
+            object.location = Point(x, y, 0)
             if self.add_object(object):
                 return True
         return False
@@ -40,8 +40,8 @@ class Scene:
         sx, sy = object.size
         if object.rotation in [Orientation.FRONT, Orientation.BACK]:
             sx, sy = sy, sx
-        for x in range(object.position.x - sx // 2, object.position.x + sx // 2):
-            for y in range(object.position.y - sy // 2, object.position.y + sy // 2):
+        for x in range(object.location.x - sx // 2, object.location.x + sx // 2):
+            for y in range(object.location.y - sy // 2, object.location.y + sy // 2):
                 self.object_floor_plan[x, y] = False
 
         return True
@@ -53,8 +53,8 @@ class Scene:
         sx, sy = object.size
         if object.rotation in [Orientation.FRONT, Orientation.BACK]:
             sx, sy = sy, sx
-        for x in range(object.position.x - sx // 2, object.position.x + sx // 2):
-            for y in range(object.position.y - sy // 2, object.position.y + sy // 2):
+        for x in range(object.location.x - sx // 2, object.location.x + sx // 2):
+            for y in range(object.location.y - sy // 2, object.location.y + sy // 2):
                 if not self.object_floor_plan[x, y]:
                     return False
         return True
