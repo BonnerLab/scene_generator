@@ -19,10 +19,16 @@ class Scene:
         self.objects = []
         self.lights = []
 
-    def navigable_points(self):
-        return np.argwhere(self.object_floor_plan).tolist()
+    def navigable_points(self, include_objects=True):
+        fp = self.object_floor_plan if include_objects else self.floor_plan
+        points = []
+        for x in range(1, fp.shape[0]):
+            for y in range(1, fp.shape[1]):
+                if fp[x - 1:x + 1, y - 1:y + 1].all():
+                    points.append([x, y])
+        return points
 
-    def add_random_object(self, type, size):
+    def randomly_place_object(self, type, size):
         rotation = random.choice([Orientation.LEFT, Orientation.FRONT, Orientation.RIGHT, Orientation.BACK])
         object = Object(type, Point(0, 0, 0), rotation, size)
         candidate_locations = self.navigable_points()
@@ -40,8 +46,8 @@ class Scene:
         sx, sy = object.size
         if object.rotation in [Orientation.FRONT, Orientation.BACK]:
             sx, sy = sy, sx
-        for x in range(object.location.x - sx // 2, object.location.x + sx // 2):
-            for y in range(object.location.y - sy // 2, object.location.y + sy // 2):
+        for x in range(int(object.location.x) - sx // 2, int(object.location.x) + sx // 2):
+            for y in range(int(object.location.y) - sy // 2, int(object.location.y) + sy // 2):
                 self.object_floor_plan[x, y] = False
 
         return True
@@ -53,16 +59,19 @@ class Scene:
         sx, sy = object.size
         if object.rotation in [Orientation.FRONT, Orientation.BACK]:
             sx, sy = sy, sx
-        for x in range(object.location.x - sx // 2, object.location.x + sx // 2):
-            for y in range(object.location.y - sy // 2, object.location.y + sy // 2):
+        for x in range(int(object.location.x) - sx // 2, int(object.location.x) + sx // 2):
+            for y in range(int(object.location.y) - sy // 2, int(object.location.y) + sy // 2):
                 if not self.object_floor_plan[x, y]:
                     return False
         return True
 
-    def visualize_floor_plan(self, with_objects=False):
-        floor_plan = self.object_floor_plan if with_objects else self.floor_plan
-        image = floor_plan.astype(np.uint8)
-        image = image * 255
+    def visualize_floor_plan(self):
+        # todo: add lights
+        floor_plan = self.floor_plan
+        objects = floor_plan ^ self.object_floor_plan
+        image = floor_plan.astype(np.uint8) * 100
+        image = np.stack([image, image, image], axis=-1)
+        image[:, :, 2][objects] = 255
         image = Image.fromarray(image)
         width, height = image.width, image.height
         if width > height:
@@ -70,7 +79,10 @@ class Scene:
         else:
             new_width, new_height = int(500 * width/height), 500
         image = image.resize((new_width, new_height))
-        image.show()
+        return image
+
+    def copy(self):
+        return deepcopy(self)
 
     @classmethod
     def squeeze_floor_plan(cls, floor_plan):

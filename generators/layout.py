@@ -1,7 +1,5 @@
 import numpy as np
-np.random.seed(27)
 import random
-random.seed(27)
 from data_classes.Scene import Scene
 from data_classes.Orientation import Orientation
 

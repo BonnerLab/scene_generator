@@ -11,50 +11,58 @@ from data_classes.Orientation import Orientation
 # todo set global scale
 
 
-def assign_material(obj, mat):
+def assign_texture(obj, texture_idx):
+    # todo: change to assign textures instead of materials (and perhaps modify the material)
     if obj.data.materials:
-        obj.data.materials[0] = mat
+        obj.data.materials[0] = texture_idx
     else:
-        obj.data.materials.append(mat)
+        obj.data.materials.append(texture_idx)
 
 
-def build_scene(scene):
-    # todo: add lights
-    # todo: add objects
-    materials = bpy.data.materials
+def render_viewpoint(viewpoint, save_path):
+    # Place the camera at the rendering viewpoint
+    camera = bpy.data.objects['Camera']
+    p, r, h = viewpoint.location, viewpoint.rotation, viewpoint.horizon
+    camera.location = (p.x, p.y, p.z)
+    camera.rotation_euler = ((h + 90) * pi / 180, 0, r * pi / 180)
+
+    # Render the scene at the viewpoint
+    bpy.context.scene.render.filepath = save_path
+    bpy.ops.render.render(write_still=True)
+
+
+def place_surfaces(floor, ceiling, walls):
+    textures = bpy.data.materials
 
     # Add floor
-    f = scene.floor
-    p, s = f.centre, f.size
+    t, p, s = floor.type, floor.centre, floor.size
     bpy.ops.mesh.primitive_plane_add()
     floor = bpy.context.active_object
     floor.name = 'floor'
     floor.location = (p.x, p.y, p.z)
     floor.scale = (s[0] / 2, s[1] / 2, 1)
-    assign_material(floor, materials[f.type])
+    assign_texture(floor, textures[t])
 
     # Add ceiling
-    c = scene.ceiling
-    p, s = c.centre, c.size
+    t, p, s = ceiling.type, ceiling.centre, ceiling.size
     bpy.ops.mesh.primitive_plane_add()
     ceiling = bpy.context.active_object
     ceiling.name = 'ceiling'
     ceiling.location = (p.x, p.y, p.z)
     ceiling.scale = (s[0] / 2, s[1] / 2, 1)
     ceiling.rotation_euler[0] = pi
-    assign_material(ceiling, materials[c.type])
+    assign_texture(ceiling, textures[t])
 
     # Add walls
-    walls = scene.walls
     for i, w in enumerate(walls):
-        p, s, o = w.centre, w.size, w.normal
+        t, p, s, o = w.type, w.centre, w.size, w.normal
         bpy.ops.mesh.primitive_plane_add()
         wall = bpy.context.active_object
         wall.name = 'wall_%d' % i
         wall.location = (p.x, p.y, p.z)
         wall.scale = (s[0] / 2, s[1] / 2, 1)
         wall.rotation_euler[0] = -pi / 2
-        assign_material(wall, materials[w.type])
+        assign_texture(wall, textures[t])
         if o == Orientation.BACK:
             wall.rotation_euler[2] = pi
         elif o == Orientation.LEFT:
@@ -63,11 +71,28 @@ def build_scene(scene):
             wall.rotation_euler[2] = pi / 2
 
 
+def place_lights(lights):
+    # todo: add lights
+    pass
+
+
+def place_objects(objects):
+    # todo: add objects
+    pass
+
+
+def build_scene(scene):
+    place_surfaces(scene.floor, scene.ceiling, scene.walls)
+    place_lights(scene.lights)
+    place_objects(scene.objects)
+
+
 def clear_scene():
-    # todo: clear lights
+    # todo: remove the MATERIAL part
     objs = [ob for ob in bpy.context.scene.objects
-            if ob.type in ['MESH'] and 'Material' not in ob.name]
-    bpy.ops.object.delete({"selected_objects": objs})
+            if ob.type in ['MESH', 'LAMP'] and 'Material' not in ob.name]
+    for obj in objs:
+        bpy.data.objects.remove(obj, do_unlink=True)
 
 
 data_dir = sys.argv[-1]
@@ -95,16 +120,9 @@ for file in scene_files:
 
         # For each sampling viewpoint
         for view_idx, viewpoint in enumerate(scene_samples.viewpoints):
-            # Place the camera at the rendering viewpoint
-            camera = bpy.data.objects['Camera']
-            p, r = viewpoint.location, viewpoint.rotation
-            camera.location = (p.x, p.y, p.z)
-            camera.rotation_euler = (r.x * pi / 180, r.y * pi / 180, r.z * pi / 180)
-
-            # Render the scene at the viewpoint
             render_name = 's=%d,v=%d.png' % (scene_idx, view_idx)
-            bpy.context.scene.render.filepath = os.path.join(scene_dir, render_name)
-            bpy.ops.render.render(write_still=True)
+            render_viewpoint(viewpoint, os.path.join(scene_dir, render_name))
+
         clear_scene()
 
 # bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
