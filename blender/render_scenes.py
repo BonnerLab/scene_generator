@@ -172,7 +172,6 @@ for file in scene_files:
             render_viewpoint(viewpoint, os.path.join(scene_dir, render_name))
 
         clear_scene()
-    break
 
 # bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
 # bpy.ops.wm.open_mainfile(filepath=bpy.data.filepath)
