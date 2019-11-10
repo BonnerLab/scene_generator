@@ -1,7 +1,7 @@
 import random
 
 
-def random_texture(scene, floor_range=(0, 0), ceiling_range=(0, 0), wall_range=(0, 0)):
+def random_textures(scene, floor_range=(0, 0), ceiling_range=(0, 0), wall_range=(0, 0)):
     scene = scene.copy()
     scene.floor.type = random.randint(*floor_range)
     scene.ceiling.type = random.randint(*ceiling_range)
@@ -10,7 +10,7 @@ def random_texture(scene, floor_range=(0, 0), ceiling_range=(0, 0), wall_range=(
     return scene
 
 
-def fixed_texture(scene, floor=0, ceiling=0, wall=0):
+def fixed_textures(scene, floor=0, ceiling=0, wall=0):
     scene = scene.copy()
     scene.floor.type = floor
     scene.ceiling.type = ceiling

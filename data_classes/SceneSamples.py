@@ -1,4 +1,5 @@
 from typing import List
+from PIL import ImageDraw
 from data_classes.Scene import Scene
 from data_classes.Viewpoint import Viewpoint
 
@@ -9,6 +10,17 @@ class SceneSamples:
         self.scenes = scenes
         self.viewpoints = viewpoints
 
-    def visualize_viewpoints(self):
-        # todo: plot point and arrow for every location and rotation of viewpoints on top of the floor plan
-        pass
+    def visualize(self):
+        image, scale = self.scenes[0].visualize(return_scale=True)
+        point_radius, arc_radius = 2, 20
+        draw = ImageDraw.Draw(image)
+        for vp in self.viewpoints:
+            centre = (int(vp.location.y * scale), int(vp.location.x * scale))
+            draw.pieslice([(centre[0] - arc_radius, centre[1] - arc_radius),
+                          (centre[0] + arc_radius, centre[1] + arc_radius)],
+                          -vp.rotation + 90 - 30, -vp.rotation + 90 + 30,
+                         fill=(0, 125, 0))
+            draw.ellipse([(centre[0] - point_radius, centre[1] - point_radius),
+                          (centre[0] + point_radius, centre[1] + point_radius)],
+                         fill=(0, 200, 0))
+        return image

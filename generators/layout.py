@@ -4,12 +4,12 @@ from data_classes.Scene import Scene
 from data_classes.Orientation import Orientation
 
 
-def random_scene(min_patches=3, max_patches=5, min_patch_size=(8, 8), max_patch_size=(20, 20), canvas_size=100):
+def random_scene(patch_range=(3, 5), min_patch_size=(8, 8), max_patch_size=(20, 20), canvas_size=400):
     assert min_patch_size[0] % 4 == 0 and min_patch_size[1] % 4 == 0
     assert max_patch_size[0] % 4 == 0 and max_patch_size[1] % 4 == 0
 
     floor_plan = np.zeros((canvas_size, canvas_size), dtype=np.bool)
-    n_patches = random.randint(min_patches, max_patches)
+    n_patches = random.randint(*patch_range)
     patches_succeeded = 0
 
     # Place a seed patch in the centre

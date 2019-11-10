@@ -1,7 +1,7 @@
 import random
 from copy import deepcopy
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from data_classes.Point import Point
 from data_classes.Object import Object
 from data_classes.Surface import Surface
@@ -65,8 +65,8 @@ class Scene:
                     return False
         return True
 
-    def visualize_floor_plan(self):
-        # todo: add lights
+    def visualize(self, return_scale=False):
+        # Floor plan and objects
         floor_plan = self.floor_plan
         objects = floor_plan ^ self.object_floor_plan
         image = floor_plan.astype(np.uint8) * 100
@@ -79,6 +79,18 @@ class Scene:
         else:
             new_width, new_height = int(500 * width/height), 500
         image = image.resize((new_width, new_height))
+        scale = new_width / width
+
+        # Lights
+        radius = 2
+        draw = ImageDraw.Draw(image)
+        for l in self.lights:
+            centre = (int(l.location.y * scale), int(l.location.x * scale))
+            draw.ellipse([(centre[0] - radius, centre[1] - radius), (centre[0] + radius, centre[1] + radius)],
+                         fill=(2555, 255, 255))
+
+        if return_scale:
+            return image, scale
         return image
 
     def copy(self):
