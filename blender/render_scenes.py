@@ -12,10 +12,11 @@ scale = 1 / 2
 h_scale = 1.25
 
 # Load textures and make materials from them
-texture_images = os.listdir(os.path.join(currentdir, 'textures'))
+texture_dir = 'textures'
+texture_images = os.listdir(os.path.join(currentdir, texture_dir))
 texture_images = [img for img in texture_images if img != '.DS_Store']
 texture_images = sorted(texture_images)
-texture_images = [os.path.join(currentdir, 'textures', img) for img in texture_images]
+texture_images = [os.path.join(currentdir, texture_dir, img) for img in texture_images]
 up_materials = []
 front_materials = []
 right_materials = []
