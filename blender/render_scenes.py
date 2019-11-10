@@ -135,7 +135,7 @@ def build_scene(scene):
 
 def clear_scene():
     objs = [obj for obj in bpy.context.scene.objects
-            if obj.type in ['MESH', 'LIGHT'] and 'Reference' in obj.name]
+            if obj.type in ['MESH', 'LIGHT'] and 'Reference' not in obj.name]
     for obj in objs:
         bpy.data.objects.remove(obj, do_unlink=True)
 
