@@ -6,13 +6,15 @@ sys.path.insert(0, parentdir)
 import bpy
 from math import pi
 import pickle
+from PIL import Image
 from data_classes.Orientation import Orientation
 
 scale = 1 / 2
 h_scale = 1.25
+resolution = (480, 270)
+texture_dir = 'textures'
 
 # Load textures and make materials from them
-texture_dir = 'textures'
 texture_images = os.listdir(os.path.join(currentdir, texture_dir))
 texture_images = [img for img in texture_images if img != '.DS_Store']
 texture_images = sorted(texture_images)
@@ -73,6 +75,8 @@ def render_viewpoint(viewpoint, save_path):
     # Render the scene at the viewpoint
     bpy.context.scene.render.filepath = save_path
     bpy.ops.render.render(write_still=True)
+    Image.open(save_path).resize((480, 270)).convert('RGB').save(save_path.replace('.png', '.jpg'))
+    os.remove(save_path)
 
 
 def place_surfaces(floor, ceiling, walls):
