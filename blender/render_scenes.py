@@ -6,6 +6,7 @@ sys.path.insert(0, parentdir)
 import bpy
 from math import pi
 import pickle
+import numpy as np
 from PIL import Image
 from data_classes.Orientation import Orientation
 
@@ -172,9 +173,15 @@ for file in scene_files:
         build_scene(scene)
 
         # For each sampling viewpoint
+        viewpoints_array = []
         for view_idx, viewpoint in enumerate(scene_samples.viewpoints):
-            render_name = 's=%d,v=%d.png' % (scene_idx, view_idx)
+            render_name = 's={:05d},v={:05d}.png'.format(scene_idx, view_idx)
             render_viewpoint(viewpoint, os.path.join(scene_dir, render_name))
+            viewpoints_array.append([viewpoint.location.x - scene.floor_plan.shape[0] / 2,
+                                     viewpoint.location.y - scene.floor_plan.shape[1] / 2,
+                                     viewpoint.rotation * pi / 180, viewpoint.horizon * pi / 180])
+        viewpoints_array = np.array(viewpoints_array, dtype=np.float32)
+        np.save(os.path.join(scene_dir, 'viewpoints.npy'), viewpoints_array)
 
         clear_scene()
 

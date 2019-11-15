@@ -24,7 +24,7 @@
     "num_views": 6,
     "min_view_padding": 5,
     "min_boundary_padding": 2,
-    "height_range": [1.25, 1.25],
+    "height": 1.25,
     "max_horizon_offset": 10,
     "centre": true,
     "max_centre_offset": 20
