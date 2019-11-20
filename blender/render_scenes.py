@@ -8,9 +8,10 @@ from math import pi
 import pickle
 import numpy as np
 from PIL import Image
+import PIL
 from data_classes.Orientation import Orientation
 
-scale = 1 / 2
+scale = 1 / 2.5
 h_scale = 1.25
 resolution = (480, 270)
 texture_dir = 'textures'
@@ -66,7 +67,7 @@ def assign_texture(obj, texture_idx, orientation):
         obj.data.materials.append(materials[texture_idx])
 
 
-def render_viewpoint(viewpoint, save_path):
+def render_viewpoint(viewpoint):
     # Place the camera at the rendering viewpoint
     camera = bpy.data.objects['Camera']
     p, r, h = viewpoint.location, viewpoint.rotation, viewpoint.horizon
@@ -74,10 +75,12 @@ def render_viewpoint(viewpoint, save_path):
     camera.rotation_euler = ((h + 90) * pi / 180, 0, (r - 90) * pi / 180)
 
     # Render the scene at the viewpoint
-    bpy.context.scene.render.filepath = save_path
+    bpy.context.scene.render.filepath = 'image.png'
     bpy.ops.render.render(write_still=True)
-    Image.open(save_path).resize((480, 270)).convert('RGB').save(save_path.replace('.png', '.jpg'))
-    os.remove(save_path)
+    image = Image.open('image.png')
+    image = np.array(image)
+    os.remove('image.png')
+    return image
 
 
 def place_surfaces(floor, ceiling, walls):
@@ -120,12 +123,13 @@ def place_surfaces(floor, ceiling, walls):
 
 def place_lights(lights):
     for i, l in enumerate(lights):
-        p, b = l.location, l.intensity
+        p, b, r = l.location, l.intensity, l.radius
         bpy.ops.object.light_add(type='POINT', radius=0.1)
         light = bpy.context.active_object
         light.name = 'light_%d' % i
         light.location = (p.x * scale, p.y * scale, p.z * h_scale)
         light.data.energy = 100 * b
+        light.data.shadow_soft_size = r
 
 
 def place_objects(objects):
@@ -172,18 +176,23 @@ for file in scene_files:
     for scene_idx, scene in enumerate(scene_samples.scenes):
         build_scene(scene)
 
-        # For each sampling viewpoint
+        # Render the scene from each viewpoint
         viewpoints_array = []
+        images_array = []
         for view_idx, viewpoint in enumerate(scene_samples.viewpoints):
-            render_name = 's={:05d},v={:05d}.png'.format(scene_idx, view_idx)
-            render_viewpoint(viewpoint, os.path.join(scene_dir, render_name))
+            image = render_viewpoint(viewpoint)
+            images_array.append(image)
             viewpoints_array.append([viewpoint.location.x - scene.floor_plan.shape[0] / 2,
                                      viewpoint.location.y - scene.floor_plan.shape[1] / 2,
                                      viewpoint.rotation * pi / 180, viewpoint.horizon * pi / 180])
+
+        # Save the rendered data
+        images_array = np.stack(images_array)
+        np.save(os.path.join(scene_dir, 'images.npy'), images_array)
         viewpoints_array = np.array(viewpoints_array, dtype=np.float32)
         np.save(os.path.join(scene_dir, 'viewpoints.npy'), viewpoints_array)
 
         clear_scene()
 
-# bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
-# bpy.ops.wm.open_mainfile(filepath=bpy.data.filepath)
+bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
+bpy.ops.wm.open_mainfile(filepath=bpy.data.filepath)

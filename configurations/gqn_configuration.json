@@ -6,26 +6,26 @@
     "canvas_size": 400
   },
   "textures": {
-    "floor_range": [0, 1],
-    "ceiling_range": [2, 3],
-    "wall_range": [4, 5]
+    "floor_range": [15, 43],
+    "ceiling_range": [15, 43],
+    "wall_range": [15, 43]
   },
   "lighting": {
     "grid": true,
-    "interval": 5,
-    "intensity": 0.5,
+    "interval": 3,
+    "intensity": 0.25,
     "radius": 2
   },
   "objects": {
-    "object_ranges": [[1, 6], [2, 4]],
-    "sizes": [[2, 4], [4, 4]]
+    "object_ranges": [],
+    "sizes": []
   },
   "viewpoints": {
-    "num_views": 6,
-    "min_view_padding": 0,
-    "min_boundary_padding": 2,
+    "num_views": 20,
+    "min_view_padding": 2,
+    "min_boundary_padding": 1,
     "height": 1.00,
-    "max_horizon_offset": 0,
+    "max_horizon_offset": 10,
     "centre": true,
     "max_centre_offset": 45
   }

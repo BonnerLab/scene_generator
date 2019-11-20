@@ -4,13 +4,14 @@ import os
 import shutil
 from argparse import ArgumentParser
 import numpy as np
+from tqdm import tqdm
 import random
 random.seed(27)
 from PIL import Image
 from data_classes.SceneSamples import SceneSamples
 from generators.layout import random_scene
 from generators.textures import random_textures
-from generators.lighting import random_lighting
+from generators.lighting import random_lighting, grid_lighting
 from generators.objects import random_objects
 from generators.viewpoints import random_viewpoints
 
@@ -25,18 +26,26 @@ os.mkdir(args.save_dir)
 
 with open(args.config_file) as f:
     config = json.loads(f.read())
+
 if 'centre' in config['viewpoints']:
     centre_views = config['viewpoints']['centre']
     del config['viewpoints']['centre']
 else:
     centre_views = False
 
+grid_light = config['lighting']['grid']
+del config['lighting']['grid']
+
 demo_floor_plans = []
-for i in range(args.num_scenes):
+for i in tqdm(range(args.num_scenes)):
     scene = random_scene(**config['layout'])
     scene = random_textures(scene, **config['textures'])
-    scene = random_lighting(scene, **config['lighting'])
     scene = random_objects(scene, **config['objects'])
+
+    if grid_light:
+        scene = grid_lighting(scene, **config['lighting'])
+    else:
+        scene = random_lighting(scene, **config['lighting'])
 
     if centre_views:
         points = np.array(scene.navigable_points(include_objects=False))
