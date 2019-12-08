@@ -8,7 +8,6 @@ from math import pi
 import pickle
 import numpy as np
 from data_classes.Orientation import Orientation
-import time
 
 scale = 1 / 2.5
 h_scale = 1.25
