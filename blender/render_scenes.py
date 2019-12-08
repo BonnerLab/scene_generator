@@ -147,19 +147,29 @@ def reset_scene():
 ################## Scene rendering ##################
 #####################################################
 
-data_dir = sys.argv[-1]
+assert len(sys.argv) == 7 or len(sys.argv) == 9
+
+data_dir = sys.argv[6]
 output_dir = os.path.join(data_dir, 'renderings')
-shutil.rmtree(output_dir, ignore_errors=True)
-os.mkdir(output_dir)
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
 
 scene_files = os.listdir(data_dir)
 scene_files = [f for f in scene_files if '.pkl' in f]
 scene_files = sorted(scene_files)
 
+# Batch rendering
+if len(sys.argv) > 7:
+    start_index, num_renders = sys.argv[7:9]
+    start_index = int(start_index)
+    end_index = start_index + int(num_renders)
+    scene_files = scene_files[start_index:end_index]
+
 # For every scene layout
 for file in scene_files:
     # Prepare the output rendering directory for the scene layout
     scene_dir = os.path.join(output_dir, file.split('.')[0])
+    shutil.rmtree(scene_dir, ignore_errors=True)
     os.mkdir(scene_dir)
 
     # Load the object specifying versions of the scene layout and viewpoints at which to sample it
