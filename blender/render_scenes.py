@@ -110,7 +110,7 @@ def build_scene(scene):
 
 
 def reset_scene():
-    bpy.ops.wm.read_homefile(filepath=bpy.data.filepath)
+    bpy.ops.wm.read_homefile(filepath='scene_generation.blend')
 
     def create_textures(orientation):
         if orientation == Orientation.UP:
