@@ -172,7 +172,6 @@ for file in scene_files:
         build_scene(scene)
 
         # Render the scene from each viewpoint
-        a = time.time()
         viewpoints_array = []
         for view_idx, viewpoint in enumerate(scene_samples.viewpoints):
             render_name = 's={:05d},v={:05d}.jpg'.format(scene_idx, view_idx)
