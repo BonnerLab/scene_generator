@@ -8,6 +8,7 @@ from math import pi
 import pickle
 import numpy as np
 from data_classes.Orientation import Orientation
+import time
 
 scale = 1 / 2.5
 h_scale = 1.25
@@ -22,34 +23,6 @@ texture_images = [os.path.join(currentdir, texture_dir, img) for img in texture_
 up_materials = []
 front_materials = []
 right_materials = []
-def create_textures(orientation):
-    if orientation == Orientation.UP:
-        mat_name = 'mat_u_{:05}'
-        ref_obj = 'ReferencePlaneU'
-        materials = up_materials
-    elif orientation == Orientation.FRONT:
-        mat_name = 'mat_f_{:05}'
-        ref_obj = 'ReferencePlaneF'
-        materials = front_materials
-    else:
-        mat_name = 'mat_r_{:05}'
-        ref_obj = 'ReferencePlaneR'
-        materials = right_materials
-    for i, img in enumerate(texture_images):
-        mat = bpy.data.materials.new(name=mat_name.format(i))
-        mat.use_nodes = True
-        bsdf = mat.node_tree.nodes["Principled BSDF"]
-        bsdf.inputs['Roughness'].default_value = 0.8
-        texImage = mat.node_tree.nodes.new('ShaderNodeTexImage')
-        texImage.image = bpy.data.images.load(img)
-        texCoord = mat.node_tree.nodes.new('ShaderNodeTexCoord')
-        texCoord.object = bpy.data.objects[ref_obj]
-        mat.node_tree.links.new(bsdf.inputs['Base Color'], texImage.outputs['Color'])
-        mat.node_tree.links.new(texCoord.outputs['Object'], texImage.inputs['Vector'])
-        materials.append(mat)
-create_textures(Orientation.UP)
-create_textures(Orientation.FRONT)
-create_textures(Orientation.RIGHT)
 
 
 def assign_texture(obj, texture_idx, orientation):
@@ -137,11 +110,39 @@ def build_scene(scene):
     place_objects(scene.objects)
 
 
-def clear_scene():
-    objs = [obj for obj in bpy.context.scene.objects
-            if obj.type in ['MESH', 'LIGHT'] and 'Reference' not in obj.name]
-    for obj in objs:
-        bpy.data.objects.remove(obj, do_unlink=True)
+def reset_scene():
+    bpy.ops.wm.open_mainfile(filepath=bpy.data.filepath)
+
+    def create_textures(orientation):
+        if orientation == Orientation.UP:
+            mat_name = 'mat_u_{:05}'
+            ref_obj = 'ReferencePlaneU'
+            materials = up_materials
+        elif orientation == Orientation.FRONT:
+            mat_name = 'mat_f_{:05}'
+            ref_obj = 'ReferencePlaneF'
+            materials = front_materials
+        else:
+            mat_name = 'mat_r_{:05}'
+            ref_obj = 'ReferencePlaneR'
+            materials = right_materials
+        materials.clear()
+        for i, img in enumerate(texture_images):
+            mat = bpy.data.materials.new(name=mat_name.format(i))
+            mat.use_nodes = True
+            bsdf = mat.node_tree.nodes["Principled BSDF"]
+            bsdf.inputs['Roughness'].default_value = 0.8
+            texImage = mat.node_tree.nodes.new('ShaderNodeTexImage')
+            texImage.image = bpy.data.images.load(img)
+            texCoord = mat.node_tree.nodes.new('ShaderNodeTexCoord')
+            texCoord.object = bpy.data.objects[ref_obj]
+            mat.node_tree.links.new(bsdf.inputs['Base Color'], texImage.outputs['Color'])
+            mat.node_tree.links.new(texCoord.outputs['Object'], texImage.inputs['Vector'])
+            materials.append(mat)
+
+    create_textures(Orientation.UP)
+    create_textures(Orientation.FRONT)
+    create_textures(Orientation.RIGHT)
 
 #####################################################
 ################## Scene rendering ##################
@@ -168,9 +169,11 @@ for file in scene_files:
 
     # For each version of the scene layout
     for scene_idx, scene in enumerate(scene_samples.scenes):
+        reset_scene()
         build_scene(scene)
 
         # Render the scene from each viewpoint
+        a = time.time()
         viewpoints_array = []
         for view_idx, viewpoint in enumerate(scene_samples.viewpoints):
             render_name = 's={:05d},v={:05d}.jpg'.format(scene_idx, view_idx)
@@ -182,8 +185,6 @@ for file in scene_files:
         # Save the rendered data
         viewpoints_array = np.array(viewpoints_array, dtype=np.float32)
         np.save(os.path.join(scene_dir, 'viewpoints.npy'), viewpoints_array)
-
-        clear_scene()
 
 # bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
 # bpy.ops.wm.open_mainfile(filepath=bpy.data.filepath)
