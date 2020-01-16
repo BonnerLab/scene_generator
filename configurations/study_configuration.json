@@ -6,9 +6,9 @@
     "canvas_size": 400
   },
   "textures": {
-    "floor_range": [15, 43],
-    "ceiling_range": [15, 43],
-    "wall_range": [15, 43]
+    "floor_range": [15, 16],
+    "ceiling_range": [32, 33],
+    "wall_range": [33, 43]
   },
   "lighting": {
     "grid": true,
@@ -21,12 +21,12 @@
     "sizes": []
   },
   "viewpoints": {
-    "num_views": 20,
-    "min_view_padding": 2,
+    "num_views": 12,
+    "min_view_padding": 4,
     "min_boundary_padding": 1,
     "height": 1.00,
-    "max_horizon_offset": 10,
-    "centre": true,
-    "max_fixation_offset": 45
+    "max_horizon_offset": 0,
+    "centre": false,
+    "max_fixation_offset": 15
   }
 }

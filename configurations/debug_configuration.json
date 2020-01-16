@@ -27,6 +27,6 @@
     "height": 1.00,
     "max_horizon_offset": 0,
     "centre": true,
-    "max_centre_offset": 45
+    "max_fixation_offset": 45
   }
 }
