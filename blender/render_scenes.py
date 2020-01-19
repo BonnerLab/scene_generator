@@ -143,6 +143,29 @@ def reset_scene():
     create_textures(Orientation.FRONT)
     create_textures(Orientation.RIGHT)
 
+
+def normalize_locations(data_dir):
+    """
+    Utility function to run on the dataset before any training
+    in order to normalize the viewpoint locations to range (-1, 1)
+    :param data_dir:
+    """
+    scenes = os.listdir(data_dir)
+    scenes = [s for s in scenes if s != '.DS_Store']
+    scenes = [os.path.join(data_dir, s) for s in scenes]
+    viewpoints = [os.path.join(s, 'viewpoints.npy') for s in scenes]
+    max_range = 0
+    for path in viewpoints:
+        viewpoint = np.load(path)
+        r = np.fabs(viewpoint[:, 0:2]).max()
+        if r > max_range:
+            max_range = r
+    for path in viewpoints:
+        viewpoint = np.load(path)
+        viewpoint[:, 0:2] = viewpoint[:, 0:2] / max_range
+        np.save(path, viewpoint)
+
+
 #####################################################
 ################## Scene rendering ##################
 #####################################################
@@ -193,6 +216,8 @@ for file in scene_files:
         # Save the rendered data
         viewpoints_array = np.array(viewpoints_array, dtype=np.float32)
         np.save(os.path.join(scene_dir, 'viewpoints.npy'), viewpoints_array)
+
+normalize_locations(output_dir)
 
 # bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
 # bpy.ops.wm.open_mainfile(filepath=bpy.data.filepath)
