@@ -96,6 +96,15 @@ class Scene:
     def copy(self):
         return deepcopy(self)
 
+    def serialize(self):
+        return {
+            'floor': self.floor.serialize(),
+            'ceiling': self.ceiling.serialize(),
+            'walls': [w.serialize() for w in self.walls],
+            'objects': [o.serialize() for o in self.objects],
+            'lights': [l.serialize() for l in self.lights]
+        }
+
     @classmethod
     def squeeze_floor_plan(cls, floor_plan):
         x_min = 0

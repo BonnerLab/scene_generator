@@ -11,3 +11,11 @@ class Surface:
         self.centre = centre
         self.normal = normal
         self.size = size
+
+    def serialize(self):
+        return {
+            'type': self.type,
+            'centre': self.centre.serialize(),
+            'normal': self.normal.name,
+            'size': self.size
+        }

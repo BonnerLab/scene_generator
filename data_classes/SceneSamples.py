@@ -24,3 +24,9 @@ class SceneSamples:
                           (centre[0] + point_radius, centre[1] + point_radius)],
                          fill=(0, 200, 0))
         return image
+
+    def serialize(self):
+        return {
+            'scenes': [s.serialize() for s in self.scenes],
+            'viewpoints': [v.serialize() for v in self.viewpoints]
+        }

@@ -7,3 +7,10 @@ class Light:
         self.location = location
         self.intensity = intensity
         self.radius = radius
+
+    def serialize(self):
+        return {
+            'location': self.location.serialize(),
+            'intensity': self.intensity,
+            'radius': self.radius
+        }

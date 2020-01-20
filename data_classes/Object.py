@@ -13,3 +13,11 @@ class Object:
         self.location = location
         self.rotation = rotation
         self.size = size
+
+    def serialize(self):
+        return {
+            'type': self.type,
+            'location': self.location.serialize(),
+            'rotation': self.rotation.name,
+            'size': self.size
+        }

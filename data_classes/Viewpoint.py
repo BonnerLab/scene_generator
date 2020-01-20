@@ -7,3 +7,10 @@ class Viewpoint:
         self.location = location
         self.rotation = rotation
         self.horizon = horizon
+
+    def serialize(self):
+        return {
+            'location': self.location.serialize(),
+            'rotation': self.rotation,
+            'horizon': self.horizon
+        }

@@ -4,3 +4,10 @@ class Point:
         self.x = x
         self.y = y
         self.z = z
+
+    def serialize(self):
+        return {
+            'x': self.x,
+            'y': self.y,
+            'z': self.z,
+        }
