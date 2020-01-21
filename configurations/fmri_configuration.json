@@ -1,0 +1,32 @@
+{
+  "layout": {
+    "patch_range": [2, 4],
+    "min_patch_size": [12, 12],
+    "max_patch_size": [20, 20],
+    "canvas_size": 400
+  },
+  "textures": {
+    "floor_range": [15, 43],
+    "ceiling_range": [15, 43],
+    "wall_range": [15, 43]
+  },
+  "lighting": {
+    "grid": true,
+    "interval": 3,
+    "intensity": 0.25,
+    "radius": 2
+  },
+  "objects": {
+    "object_ranges": [],
+    "sizes": []
+  },
+  "viewpoints": {
+    "num_views": 0,
+    "min_view_padding": 2,
+    "min_boundary_padding": 1,
+    "height": 1.00,
+    "max_horizon_offset": 10,
+    "centre": true,
+    "max_fixation_offset": 45
+  }
+}

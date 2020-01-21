@@ -65,9 +65,9 @@ def place_surfaces(floor, ceiling, walls, scale, h_scale):
         if o == Orientation.BACK:
             wall.rotation_euler[2] = pi
         elif o == Orientation.LEFT:
-            wall.rotation_euler[2] = pi / 2
-        elif o == Orientation.RIGHT:
             wall.rotation_euler[2] = -pi / 2
+        elif o == Orientation.RIGHT:
+            wall.rotation_euler[2] = pi / 2
 
 
 def place_lights(lights, scale, h_scale):

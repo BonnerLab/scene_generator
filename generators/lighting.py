@@ -31,13 +31,13 @@ def random_lighting(scene, tiles_to_light_range=(80, 100), min_light_padding=5, 
     return scene
 
 
-def grid_lighting(scene, interval=5, intensity=1.0, radius=2):
+def grid_lighting(scene, interval=5, intensity=1.0, radius=2, height=1.75):
     scene = scene.copy()
     locations_available = scene.navigable_points(include_objects=False)
     for x in range(0, scene.floor_plan.shape[0], interval):
         for y in range(0, scene.floor_plan.shape[1], interval):
             if [x, y] not in locations_available:
                 continue
-            light = Light(Point(x, y, 1.75), intensity, radius)
+            light = Light(Point(x, y, height), intensity, radius)
             scene.add_light(light)
     return scene

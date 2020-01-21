@@ -98,4 +98,4 @@ if __name__ == '__main__':
             viewpoints_array = np.array(viewpoints_array, dtype=np.float32)
             np.save(os.path.join(scene_dir, 'viewpoints.npy'), viewpoints_array)
 
-    normalize_locations(output_dir)
+    # normalize_locations(output_dir)
