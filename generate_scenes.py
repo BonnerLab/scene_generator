@@ -24,13 +24,15 @@ def get_centre_fixation(scene):
 
 
 def get_outward_fixation(scene):
-    x_max, y_max = scene.floor_plan.shape
-    edge_points = [(x, 0) for x in range(x_max + 1)] + \
-                  [(0, y) for y in range(y_max + 1)] + \
-                  [(x, y_max) for x in range(x_max + 1)] + \
-                  [(x_max, y) for y in range(y_max + 1)]
-    fixation = random.sample(edge_points, 1)[0]
-    return fixation
+    # x_max, y_max = scene.floor_plan.shape
+    # edge_points = [(x, 0) for x in range(x_max + 1)] + \
+    #               [(0, y) for y in range(y_max + 1)] + \
+    #               [(x, y_max) for x in range(x_max + 1)] + \
+    #               [(x_max, y) for y in range(y_max + 1)]
+    # fixation = random.sample(edge_points, 1)[0]
+    # return fixation
+    return (0, 0)
+
 
 parser = ArgumentParser(description='Generative Query Network training')
 parser.add_argument('--config_file', required=True, type=str, help='path to the configuration file')
