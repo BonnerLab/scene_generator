@@ -28,9 +28,10 @@ def normalize_locations(data_dir):
     in order to normalize the viewpoint locations to range (-1, 1)
     :param data_dir:
     """
-    scenes = os.listdir(data_dir)
+    output_dir = os.path.join(data_dir, 'renderings')
+    scenes = os.listdir(output_dir)
     scenes = [s for s in scenes if s != '.DS_Store']
-    scenes = [os.path.join(data_dir, s) for s in scenes]
+    scenes = [os.path.join(output_dir, s) for s in scenes]
     viewpoints = [os.path.join(s, 'viewpoints.npy') for s in scenes]
     max_range = 0
     for path in viewpoints:
@@ -42,6 +43,7 @@ def normalize_locations(data_dir):
         viewpoint = np.load(path)
         viewpoint[:, 0:2] = viewpoint[:, 0:2] / max_range
         np.save(path, viewpoint)
+    np.save(os.path.join(data_dir, 'scale_factor.npy'), np.array([max_range]))
 
 
 #####################################################
@@ -98,4 +100,4 @@ if __name__ == '__main__':
             viewpoints_array = np.array(viewpoints_array, dtype=np.float32)
             np.save(os.path.join(scene_dir, 'viewpoints.npy'), viewpoints_array)
 
-    normalize_locations(output_dir)
+    # normalize_locations(data_dir)
