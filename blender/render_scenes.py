@@ -43,7 +43,7 @@ def normalize_locations(data_dir):
         viewpoint = np.load(path)
         viewpoint[:, 0:2] = viewpoint[:, 0:2] / max_range
         np.save(path, viewpoint)
-    np.save(os.path.join(data_dir, 'scale_factor.npy'), np.array([max_range]))
+    np.save(os.path.join(data_dir, 'scale_factor.npy'), max_range)
 
 
 #####################################################
