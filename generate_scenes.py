@@ -62,6 +62,7 @@ else:
 grid_light = config['lighting']['grid']
 del config['lighting']['grid']
 
+num_demo_samples = 64
 demo_floor_plans = []
 for i in tqdm(range(args.num_scenes)):
     scene = random_scene(**config['layout'])
@@ -84,12 +85,13 @@ for i in tqdm(range(args.num_scenes)):
     scene_sample = SceneSamples([scene], viewpoints)
     with open(os.path.join(args.save_dir, '{:07d}.pkl'.format(i)), 'wb') as f:
         pickle.dump(scene_sample, f)
-    if i < 16:
+    if i < num_demo_samples:
         demo_floor_plans.append(scene_sample.visualize())
 
-grid = Image.new('RGB', (500 * 4, 500 * 4))
-for i in range(0, 4 * 500, 500):
-    for j in range(0, 4 * 500, 500):
+grid_dim = int(num_demo_samples ** 0.5)
+grid = Image.new('RGB', (500 * grid_dim, 500 * grid_dim))
+for i in range(0, grid_dim * 500, 500):
+    for j in range(0, grid_dim * 500, 500):
         fp = demo_floor_plans.pop(0)
         grid.paste(fp, (i, j))
 grid.save(os.path.join(args.save_dir, 'samples.png'))
