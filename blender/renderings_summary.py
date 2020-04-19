@@ -19,7 +19,7 @@ def scene_grid(dir):
     return grid
 
 
-parser = ArgumentParser(description='Generative Query Network training')
+parser = ArgumentParser(description='Generate a summary image of renderings from multiple scenes')
 parser.add_argument('--data_dir', required=True, type=str, help='path to the generated scenes')
 args = parser.parse_args()
 
